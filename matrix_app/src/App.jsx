@@ -1,41 +1,16 @@
 import { useMemo, useState } from 'react'
 import './App.css'
+import { MatrixSearcher } from './MatrixSearcher'
 
 const HEX_CHARS = '0123456789ABCDEF'
 
-const generateHexChar = () => HEX_CHARS[Math.floor(Math.random() * HEX_CHARS.length)]
+const generateHexChar = () =>
+  HEX_CHARS[Math.floor(Math.random() * HEX_CHARS.length)]
 
 const generateMatrix = (rows, cols) =>
   Array.from({ length: rows }, () =>
     Array.from({ length: cols }, () => generateHexChar()),
   )
-
-const findSubMatrices2x2 = (matrix, pattern) => {
-  if (!matrix.length || pattern.some((cell) => cell.length !== 1)) return []
-
-  const [p00, p01, p10, p11] = pattern
-  const matches = []
-
-  for (let row = 0; row < matrix.length - 1; row += 1) {
-    for (let col = 0; col < matrix[0].length - 1; col += 1) {
-      if (
-        matrix[row][col] === p00 &&
-        matrix[row][col + 1] === p01 &&
-        matrix[row + 1][col] === p10 &&
-        matrix[row + 1][col + 1] === p11
-      ) {
-        matches.push({
-          topLeft: { x: col + 1, y: row + 1 },
-          topRight: { x: col + 2, y: row + 1 },
-          bottomLeft: { x: col + 1, y: row + 2 },
-          bottomRight: { x: col + 2, y: row + 2 },
-        })
-      }
-    }
-  }
-
-  return matches
-}
 
 function App() {
   // Размеры матрицы (строки и столбцы) — изначально пустые поля
@@ -116,7 +91,7 @@ function App() {
       return
     }
 
-    setMatches(findSubMatrices2x2(matrix, pattern))
+    setMatches(MatrixSearcher.findSubMatrices2x2(matrix, pattern))
   }
 
   const isGenerateEnabled = useMemo(() => {
