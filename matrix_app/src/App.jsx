@@ -40,6 +40,12 @@ function App() {
     const parsedRows = parseInt(rows, 10)
     const parsedCols = parseInt(cols, 10)
 
+    // размеры матрицы должны быть не меньше 2x2 (размер подматрицы)
+    if (parsedRows < 2 || parsedCols < 2) {
+      window.alert('Размер матрицы должен быть не меньше 2x2.')
+      return
+    }
+
     const safeRows = Math.max(2, Math.min(30, parsedRows))
     const safeCols = Math.max(2, Math.min(30, parsedCols))
 
@@ -77,17 +83,9 @@ function App() {
   }
 
   const handleFind = () => {
-    // Проверка: матрица должна быть сгенерирована
+    //матрица должна быть сгенерирована
     if (!matrix.length || !matrix[0]?.length) {
       window.alert('Сначала сгенерируйте матрицу.')
-      return
-    }
-
-    // Проверка: размеры матрицы должны быть не меньше 2x2 (размер подматрицы)
-    const matrixRows = matrix.length
-    const matrixCols = matrix[0].length
-    if (matrixRows < 2 || matrixCols < 2) {
-      window.alert('Размер матрицы должен быть не меньше 2x2.')
       return
     }
 
@@ -107,10 +105,14 @@ function App() {
 
   const isFindEnabled = useMemo(
     () =>
+      // Матрица должна быть сгенерирована
+      matrix.length > 0 &&
+      matrix[0]?.length > 0 &&
+      // Все поля подматрицы должны быть заполнены шестнадцатеричными значениями
       pattern.every(
         (cell) => cell.length === 1 && HEX_CHARS.includes(cell.toUpperCase()),
       ),
-    [pattern],
+    [matrix, pattern],
   )
 
   const renderMatrix = () => (
@@ -146,7 +148,17 @@ function App() {
           </p>
         </div>
       </header>
-
+      <div className="main-box">
+      <section className="matrix-section">
+        <div className="matrix-header">
+          <h2>Матрица {rows} x {cols}</h2>
+            <div className="legend">
+              <span className="legend-color highlight" />
+              <span>— найденные вхождения</span>
+            </div>
+        </div>
+        <div className="matrix-frame">{renderMatrix()}</div>
+      </section>
       <section className="controls">
         <div className="sizes">
           <div className="control-group">
@@ -197,7 +209,7 @@ function App() {
             </div>
             <button
               type="button"
-              className="secondary"
+              className="primary"
               onClick={handleFind}
               disabled={!isFindEnabled}
             >
@@ -207,16 +219,7 @@ function App() {
         </div>
       </section>
 
-      <section className="matrix-section">
-        <div className="matrix-header">
-          <h2>Матрица {rows} x {cols}</h2>
-          <div className="legend">
-            <span className="legend-color highlight" />
-            <span>— найденные вхождения</span>
-          </div>
-        </div>
-        <div className="matrix-frame">{renderMatrix()}</div>
-      </section>
+      </div>
 
       <section className="results">
         <h3>Найдено совпадений: {matches.length}</h3>
