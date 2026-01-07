@@ -52,7 +52,7 @@ button:disabled,
 .controls {
   display: flex;
   flex-direction: column;
-  //grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  /*grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));*/
   gap: 16px;
   align-items: start;
   background: #fff;
