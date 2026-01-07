@@ -38,13 +38,18 @@ const findSubMatrices2x2 = (matrix, pattern) => {
 }
 
 function App() {
-  const [rows, setRows] = useState(8)
-  const [cols, setCols] = useState(12)
-  const [matrix, setMatrix] = useState(() => generateMatrix(8, 12))
-  const [pattern, setPattern] = useState(['A', 'B', 'C', 'D'])
-  const [matches, setMatches] = useState(() =>
-    findSubMatrices2x2(generateMatrix(8, 12), ['A', 'B', 'C', 'D']),
-  )
+  // Размеры матрицы (строки и столбцы) — изначально пустые поля
+  const [rows, setRows] = useState('')
+  const [cols, setCols] = useState('')
+
+  // Матрица по умолчанию не сгенерирована
+  const [matrix, setMatrix] = useState([])
+
+  // Подматрица 2x2 — изначально пустые поля
+  const [pattern, setPattern] = useState(['', '', '', ''])
+
+  // Совпадения — изначально отсутствуют
+  const [matches, setMatches] = useState([])
 
   const highlightedCells = useMemo(() => {
     const set = new Set()
@@ -57,18 +62,32 @@ function App() {
   }, [matches])
 
   const handleGenerate = () => {
-    setMatrix(generateMatrix(rows, cols))
+    const parsedRows = parseInt(rows, 10)
+    const parsedCols = parseInt(cols, 10)
+
+    const safeRows = Math.max(2, Math.min(30, parsedRows))
+    const safeCols = Math.max(2, Math.min(30, parsedCols))
+
+    setMatrix(generateMatrix(safeRows, safeCols))
     setMatches([])
   }
 
   const handleSizeChange = (setter) => (event) => {
-    const value = parseInt(event.target.value, 10)
-    if (Number.isNaN(value)) {
-      setter(2)
+    const { value } = event.target
+    // Разрешаем пустое значение, чтобы поле можно было очистить
+    if (value === '') {
+      setter('')
       return
     }
-    const clamped = Math.max(2, Math.min(30, value))
-    setter(clamped)
+
+    const numeric = parseInt(value, 10)
+    if (Number.isNaN(numeric) || numeric <= 0) {
+      // Игнорируем некорректный ввод (не положительное целое)
+      return
+    }
+
+    const clamped = Math.max(1, Math.min(30, numeric))
+    setter(String(clamped))
   }
 
   const handlePatternChange = (index) => (event) => {
@@ -83,8 +102,41 @@ function App() {
   }
 
   const handleFind = () => {
+    // Проверка: матрица должна быть сгенерирована
+    if (!matrix.length || !matrix[0]?.length) {
+      window.alert('Сначала сгенерируйте матрицу.')
+      return
+    }
+
+    // Проверка: размеры матрицы должны быть не меньше 2x2 (размер подматрицы)
+    const matrixRows = matrix.length
+    const matrixCols = matrix[0].length
+    if (matrixRows < 2 || matrixCols < 2) {
+      window.alert('Размер матрицы должен быть не меньше 2x2.')
+      return
+    }
+
     setMatches(findSubMatrices2x2(matrix, pattern))
   }
+
+  const isGenerateEnabled = useMemo(() => {
+    const parsedRows = parseInt(rows, 10)
+    const parsedCols = parseInt(cols, 10)
+    return (
+      Number.isInteger(parsedRows) &&
+      Number.isInteger(parsedCols) &&
+      parsedRows > 0 &&
+      parsedCols > 0
+    )
+  }, [rows, cols])
+
+  const isFindEnabled = useMemo(
+    () =>
+      pattern.every(
+        (cell) => cell.length === 1 && HEX_CHARS.includes(cell.toUpperCase()),
+      ),
+    [pattern],
+  )
 
   const renderMatrix = () => (
     <div
@@ -144,7 +196,11 @@ function App() {
               onChange={handleSizeChange(setCols)}
             />
           </div>
-          <button className="primary full" onClick={handleGenerate}>
+          <button
+            className="primary full"
+            onClick={handleGenerate}
+            disabled={!isGenerateEnabled}
+          >
             Сгенерировать
           </button>
         </div>
@@ -164,7 +220,12 @@ function App() {
                 />
               ))}
             </div>
-            <button type="button" className="secondary" onClick={handleFind}>
+            <button
+              type="button"
+              className="secondary"
+              onClick={handleFind}
+              disabled={!isFindEnabled}
+            >
               Найти
             </button>
           </div>
