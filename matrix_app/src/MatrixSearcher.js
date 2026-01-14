@@ -1,4 +1,4 @@
-const HEX_CHARS = '0123456789ABCDEF'
+const HEX_CHARS = '0123456789ABCDEF';
 
 export class MatrixSearcher {
   /**
@@ -17,7 +17,7 @@ export class MatrixSearcher {
       !Array.isArray(matrix[0]) ||
       !Array.isArray(pattern)
     ) {
-      return []
+      return [];
     }
 
     // Валидация размеров и содержимого подматрицы
@@ -26,21 +26,21 @@ export class MatrixSearcher {
       patternRows <= 0 ||
       patternCols <= 0
     ) {
-      return []
+      return [];
     }
 
-    const rows = matrix.length
-    const cols = matrix[0].length
+    const rows = matrix.length;
+    const cols = matrix[0].length;
 
     // Если подматрица больше исходной матрицы — совпадений быть не может
     if (rows < patternRows || cols < patternCols) {
-      return []
+      return [];
     }
 
-    const matches = []
+    const matches = [];
 
-    const maxRowStart = rows - patternRows
-    const maxColStart = cols - patternCols
+    const maxRowStart = rows - patternRows;
+    const maxColStart = cols - patternCols;
 
     for (let row = 0; row <= maxRowStart; row += 1) {
       for (let col = 0; col <= maxColStart; col += 1) {
@@ -57,7 +57,7 @@ export class MatrixSearcher {
       }
     }
 
-    return matches
+    return matches;
   }
 
   /**
@@ -90,7 +90,7 @@ export class MatrixSearcher {
    * @returns {Array} массив совпадений с координатами вершин
    */
   static findSubMatrices2x2(matrix, pattern) {
-    return MatrixSearcher.findSubMatrices(matrix, pattern, 2, 2)
+    return MatrixSearcher.findSubMatrices(matrix, pattern, 2, 2);
   }
 }
 
