@@ -1,5 +1,5 @@
 :root {
-  font-family: 'Inter', system-ui, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Inter','Segoe UI', sans-serif;
   line-height: 1.5;
   font-weight: 400;
   color: #0f172a;
@@ -23,7 +23,7 @@ h1,
 h2,
 h3 {
   margin: 0;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 p {

@@ -2,13 +2,12 @@ const HEX_CHARS = '0123456789ABCDEF'
 
 export class MatrixSearcher {
   /**
-   * Поиск всех вхождений подматрицы MxN (по умолчанию 2x2)
-   * в матрице шестнадцатеричных символов.
+   * Поиск всех вхождений подматрицы 2x2 в матрице шестнадцатеричных символов.
    *
    * @param {string[][]} matrix - основная матрица
-   * @param {string[]} pattern - подматрица в виде плоского массива длиной M * N
-   * @param {number} patternRows - количество строк подматрицы (M)
-   * @param {number} patternCols - количество столбцов подматрицы (N)
+   * @param {string[]} pattern - подматрица в виде плоского массива
+   * @param {number} patternRows - количество строк подматрицы (2)
+   * @param {number} patternCols - количество столбцов подматрицы (2)
    * @returns {Array} массив совпадений с координатами вершин
    */
   static findSubMatrices(matrix, pattern, patternRows = 2, patternCols = 2) {
@@ -30,18 +29,6 @@ export class MatrixSearcher {
       return []
     }
 
-    // Каждый элемент — ровно один шестнадцатеричный символ
-    if (
-      pattern.some(
-        (cell) =>
-          typeof cell !== 'string' ||
-          cell.length !== 1 ||
-          !HEX_CHARS.includes(cell.toUpperCase()),
-      )
-    ) {
-      return []
-    }
-
     const rows = matrix.length
     const cols = matrix[0].length
 
@@ -57,18 +44,7 @@ export class MatrixSearcher {
 
     for (let row = 0; row <= maxRowStart; row += 1) {
       for (let col = 0; col <= maxColStart; col += 1) {
-        let isMatch = true
-
-        // Проверяем все элементы подматрицы
-        outer: for (let pr = 0; pr < patternRows; pr += 1) {
-          for (let pc = 0; pc < patternCols; pc += 1) {
-            const patternIndex = pr * patternCols + pc
-            if (matrix[row + pr][col + pc] !== pattern[patternIndex]) {
-              isMatch = false
-              break outer
-            }
-          }
-        }
+        let isMatch = MatrixSearcher.#getMatches(matrix, pattern, row, col, patternRows, patternCols);
 
         if (isMatch) {
           matches.push({
@@ -85,8 +61,30 @@ export class MatrixSearcher {
   }
 
   /**
-   * Обёртка для поиска строго подматрицы 2x2 (для совместимости с текущим UI).
-   *
+   * Проверка на совпадение всех элементов подматрицы с основной матрицей
+   * @param {string[][]} matrix - основная матрица
+   * @param {string[]} pattern - подматрица в виде плоского массива
+   * @param {number} row - начальная строка в матрице
+   * @param {number} col - начальный столбец в матрице
+   * @param {number} patternRows - строки подматрицы
+   * @param {number} patternCols - колонки подматрицы
+   * @returns {boolean} true если совпадение найдено
+   */ 
+  static #getMatches(matrix, pattern, row, col, patternRows, patternCols){
+    // Проверяем все элементы подматрицы
+    for (let pr = 0; pr < patternRows; pr += 1) {
+      for (let pc = 0; pc < patternCols; pc += 1) {
+        const patternIndex = pr * patternCols + pc
+        if (matrix[row + pr][col + pc] !== pattern[patternIndex]) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  /**
    * @param {string[][]} matrix - основная матрица
    * @param {string[]} pattern - подматрица 2x2 в виде массива из 4 символов [p00, p01, p10, p11]
    * @returns {Array} массив совпадений с координатами вершин
